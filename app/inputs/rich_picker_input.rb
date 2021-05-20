@@ -107,7 +107,12 @@ if Object.const_defined?("SimpleForm")
     def input(wrapper_options)
       @editor_options = Rich.options(options[:config], object_name, object.id)
       # @dom_id = "#{object_name}[#{attribute_name}]"
-      @dom_id = "#{object_name.gsub(/\]\[|\]\[|\[|\]/, '_')}#{attribute_name}"
+      # There is an issue where a field on the base model will result in a dom_id
+      # of `objectfield_name`, instead of the expected `object_field_name`.
+      # This does not impact nested resources, so we also have to make sure
+      # we remove double underscore. This may cause someone issues at some point
+      # but not us, today.
+      @dom_id = "#{object_name.gsub(/\]\[|\]\[|\[|\]/, '_')}_#{attribute_name}".gsub('__', '_')
 
       local_input_options = {
         :class => 'rich-picker',
